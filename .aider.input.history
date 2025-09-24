@@ -298,3 +298,23 @@
 +5. Make responses feel more personalized and less repetitive
 +6. Add seasonal or weather-related responses
 +7. Include references to Italian food, family traditions, and superstitions"
+
+# 2025-09-24 19:43:00.491797
++
++ app/\(tabs\)/index.tsx app/\(tabs\)/superstition.tsx --message "Replace all ugly icons with beautiful Italian-themed graphics:
++
++For buttons, use these Italian-themed icons from @expo/vector-icons:
++- Ask Nonna: MaterialCommunityIcons 'pasta' or 'heart'
++- Check Superstition: FontAwesome 'eye' or MaterialIcons 'photo-camera' 
++- Explore: Ionicons 'compass' or 'map'
++- Hand Gesture: MaterialCommunityIcons 'hand-okay' or 'gesture'
++
++Add Italian color scheme:
++- Primary: '#006633' (Italian green)
++- Secondary: '#CD212A' (Italian red) 
++- Accent: '#FFFFFF' (white)
++- Background gradients using these colors
++
++Make buttons look professional with proper shadows, rounded corners, and Italian flag color schemes."
++
++
