@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Platform, Animated, Alert } from 'react-native';
+import { Animated, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
 import {
   Box,
+  ScrollView,
   VStack,
   HStack,
   Button,
@@ -217,13 +218,15 @@ export default function HomeScreen() {
 
   return (
     <Box flex={1} bg="muted.50" _dark={{ bg: 'coolGray.900' }}>
-      <Box overflow="hidden" roundedBottom="3xl" shadow="6">
+      <ScrollView flex={1} contentContainerStyle={{ paddingBottom: 24 }}>
+        <Box overflow="hidden" roundedBottom="3xl" shadow="6">
           <LinearGradient
             colors={['#6366F1', '#8B5CF6', '#F472B6']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ paddingTop: 56, paddingBottom: 20, paddingHorizontal: 16 }}
           >
+            <Box safeAreaTop />
             <VStack space="2" alignItems="center">
               <Heading size="lg" color="white" textAlign="center">
                 Nonna’s Wisdom & Superstition Oracle 🇮🇹
@@ -240,7 +243,7 @@ export default function HomeScreen() {
                       key={p}
                       size="sm"
                       variant={selected ? 'solid' : 'subtle'}
-                      colorScheme={selected ? 'purple' : 'coolGray'}
+                      colorScheme={selected ? 'primary' : 'coolGray'}
                       rounded="full"
                       onPress={() => setPersonality(p)}
                     >
@@ -291,7 +294,7 @@ export default function HomeScreen() {
                 <Button
                   flex={1}
                   onPress={onAskNonna}
-                  colorScheme="purple"
+                  colorScheme="primary"
                   rounded="lg"
                   shadow="2"
                   isLoading={isAsking}
@@ -300,7 +303,7 @@ export default function HomeScreen() {
                   Ask Nonna for Wisdom 🤌
                 </Button>
                 <Link href="/superstition" asChild>
-                  <Button flex={1} colorScheme="indigo" rounded="lg" shadow="2">
+                  <Button flex={1} colorScheme="primary" rounded="lg" shadow="2" variant="outline">
                     Check Superstition 🔮
                   </Button>
                 </Link>
@@ -364,7 +367,7 @@ export default function HomeScreen() {
                   <Button
                     flex={1}
                     onPress={() => speakItalian(response)}
-                    colorScheme="dark"
+                    colorScheme="primary"
                     rounded="lg"
                     variant="solid"
                     isLoading={isSpeaking}
@@ -388,6 +391,7 @@ export default function HomeScreen() {
             </VStack>
           </Card>
         </VStack>
-      </Box>
+      </ScrollView>
+    </Box>
   );
 }
