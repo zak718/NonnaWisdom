@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import * as Speech from 'expo-speech';
+import { MaterialCommunityIcons, FontAwesome, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { generateWisdom as baseGenerateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
  // Storage features temporarily disabled for basic functionality
@@ -356,7 +357,10 @@ export default function HomeScreen() {
                   <Text style={styles.primaryButtonText}>Thinking…</Text>
                 </View>
               ) : (
-                <Text style={styles.primaryButtonText}>Ask Nonna for Wisdom 🤌</Text>
+                <View style={styles.buttonContentRow}>
+                  <MaterialCommunityIcons name="pasta" size={18} color="#fff" style={{ marginRight: 8 }} />
+                  <Text style={styles.primaryButtonText}>Ask Nonna for Wisdom</Text>
+                </View>
               )}
             </TouchableOpacity>
 
@@ -365,7 +369,10 @@ export default function HomeScreen() {
               activeOpacity={0.8}
               style={[styles.secondaryButton]}
             >
-              <Text style={styles.secondaryButtonText}>Check Superstition 🔮</Text>
+              <View style={styles.buttonContentRow}>
+                <MaterialIcons name="photo-camera" size={18} color={COLORS.secondary} style={{ marginRight: 8 }} />
+                <Text style={styles.secondaryButtonText}>Check Superstition</Text>
+              </View>
             </TouchableOpacity>
           </View>
 
@@ -406,8 +413,9 @@ const COLORS = {
   surface: '#ffffff',
   text: '#333333',
   subtle: '#868e96',
-  primary: '#007bff',
-  primaryDark: '#0069d9',
+  primary: '#006633',   // Italian green
+  secondary: '#CD212A', // Italian red
+  accent: '#FFFFFF',    // White
   border: '#e9ecef',
   shadow: '#000000',
 };
@@ -435,9 +443,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
     borderTopWidth: 4,
-    borderTopColor: '#CE2B37',
+    borderTopColor: '#CD212A',
     borderBottomWidth: 4,
-    borderBottomColor: '#009246',
+    borderBottomColor: '#006633',
   },
   headerTitle: {
     fontSize: 22,
@@ -575,7 +583,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.secondary,
     shadowColor: COLORS.shadow,
     shadowOpacity: 0.08,
     shadowOffset: { width: 0, height: 4 },
@@ -583,7 +591,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   secondaryButtonText: {
-    color: COLORS.primary,
+    color: COLORS.secondary,
     fontWeight: '700',
     fontSize: 16,
   },

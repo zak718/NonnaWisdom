@@ -3,6 +3,7 @@ import { StyleSheet, View, Pressable, Alert, ScrollView, Platform } from 'react-
 import { Image } from 'expo-image';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
+import { MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -44,7 +45,10 @@ export default function SuperstitionScreen() {
                 }
               }}
             >
-              <ThemedText style={styles.captureText}>Simulate Capture 🔮</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <FontAwesome name="eye" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <ThemedText style={styles.captureText}>Simulate Capture</ThemedText>
+              </View>
             </Pressable>
           </View>
 
@@ -77,7 +81,10 @@ export default function SuperstitionScreen() {
       <ThemedView style={styles.centered}>
         <ThemedText type="title">Camera permission needed</ThemedText>
         <Pressable style={styles.permissionButton} onPress={() => requestPermission()}>
-          <ThemedText style={styles.permissionText}>Grant Camera Access</ThemedText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <MaterialIcons name="photo-camera" size={18} color="#fff" style={{ marginRight: 8 }} />
+            <ThemedText style={styles.permissionText}>Grant Camera Access</ThemedText>
+          </View>
         </Pressable>
       </ThemedView>
     );
@@ -150,15 +157,24 @@ export default function SuperstitionScreen() {
       <View style={styles.actions}>
         {!photoUri ? (
           <Pressable style={styles.captureButton} onPress={onCapture}>
-            <ThemedText style={styles.captureText}>Take Photo 🔮</ThemedText>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <MaterialIcons name="photo-camera" size={18} color="#fff" style={{ marginRight: 8 }} />
+              <ThemedText style={styles.captureText}>Take Photo</ThemedText>
+            </View>
           </Pressable>
         ) : (
           <>
             <Pressable style={styles.secondaryButton} onPress={() => setPhotoUri(null)}>
-              <ThemedText style={styles.secondaryText}>Retake</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialIcons name="refresh" size={18} color="#000" style={{ marginRight: 8 }} />
+                <ThemedText style={styles.secondaryText}>Retake</ThemedText>
+              </View>
             </Pressable>
             <Pressable style={styles.captureButton} onPress={() => setPhotoUri(null)}>
-              <ThemedText style={styles.captureText}>New Photo</ThemedText>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <MaterialIcons name="photo-camera" size={18} color="#fff" style={{ marginRight: 8 }} />
+                <ThemedText style={styles.captureText}>New Photo</ThemedText>
+              </View>
             </Pressable>
           </>
         )}
@@ -195,7 +211,7 @@ const styles = StyleSheet.create({
   permissionButton: {
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#009246',
+    backgroundColor: '#006633',
     borderRadius: 12,
   },
   permissionText: { color: '#fff', fontWeight: '700' },
@@ -208,7 +224,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  captureButton: { backgroundColor: '#CE2B37', paddingVertical: 12, paddingHorizontal: 18, borderRadius: 12 },
+  captureButton: { backgroundColor: '#CD212A', paddingVertical: 12, paddingHorizontal: 18, borderRadius: 12 },
   captureText: { color: '#fff', fontWeight: '700' },
   secondaryButton: { backgroundColor: '#eee', paddingVertical: 12, paddingHorizontal: 18, borderRadius: 12 },
   secondaryText: { fontWeight: '600' },
