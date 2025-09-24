@@ -36,6 +36,18 @@ const SUPERSTITIONS: SuperstitionResult[] = [
     description: 'Someone is jealous of your sauce.',
     ritual: 'Wear a cornicello, dab olive oil on your forehead, and say Nonna’s blessing before bed.',
   },
+  {
+    icon: '🍝',
+    title: 'Spilled Food',
+    description: 'A tragic waste and a sign to be humble.',
+    ritual: 'Cook a fresh portion, share a bite with someone, and sprinkle basil while saying “pace e amore” three times.',
+  },
+  {
+    icon: '🪞',
+    title: 'Broken Mirror',
+    description: 'Bad luck tries to sneak in through the shards.',
+    ritual: 'Sweep pieces away from you, wrap them in cloth, and say seven prayers before disposing without looking back.',
+  },
 ];
 
 export async function analyzePhotoAsync(_uri: string): Promise<SuperstitionResult> {
