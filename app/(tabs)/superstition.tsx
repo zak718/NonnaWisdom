@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Pressable, Alert, ScrollView } from 'react-native';
+import { StyleSheet, View, Pressable, Alert, ScrollView, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
@@ -20,6 +20,57 @@ export default function SuperstitionScreen() {
       requestPermission();
     }
   }, [permission, requestPermission]);
+
+  if (Platform.OS === 'web') {
+    return (
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <ThemedView style={styles.container}>
+          <View style={[styles.preview, { backgroundColor: '#eee', alignItems: 'center', justifyContent: 'center' }]}>
+            <ThemedText style={{ color: '#666' }}>Camera preview not available on web</ThemedText>
+          </View>
+
+          <View style={styles.actions}>
+            <Pressable
+              style={styles.captureButton}
+              onPress={async () => {
+                try {
+                  setPhotoUri('web');
+                  setResult(null);
+                  const analysis = await analyzePhotoAsync('web');
+                  setResult(analysis);
+                  setNonnaResponse(buildNonnaResponse(analysis));
+                } catch (e) {
+                  Alert.alert('Mamma mia!', 'Nonna cannot analyze the photo. Try again.');
+                }
+              }}
+            >
+              <ThemedText style={styles.captureText}>Simulate Capture 🔮</ThemedText>
+            </Pressable>
+          </View>
+
+          <View style={styles.result}>
+            {result ? (
+              <>
+                <ThemedText type="title">Superstition Result</ThemedText>
+                <ThemedText style={styles.resultText}>
+                  {result.icon} {result.title}
+                </ThemedText>
+                <ThemedText style={styles.resultSub}>{result.description}</ThemedText>
+                <ThemedText style={styles.ritualTitle}>Ritual</ThemedText>
+                <ThemedText style={styles.ritualText}>{result.ritual}</ThemedText>
+                <ThemedText style={styles.nonnaTitle}>Nonna’s Verdict</ThemedText>
+                <ThemedText style={styles.nonnaText}>{nonnaResponse}</ThemedText>
+              </>
+            ) : (
+              <ThemedText style={styles.hint}>
+                Click “Simulate Capture” and let Nonna divine the superstition. Madonna santissima! 📷
+              </ThemedText>
+            )}
+          </View>
+        </ThemedView>
+      </ScrollView>
+    );
+  }
 
   if (!permission?.granted) {
     return (
@@ -99,7 +150,7 @@ export default function SuperstitionScreen() {
       <View style={styles.actions}>
         {!photoUri ? (
           <Pressable style={styles.captureButton} onPress={onCapture}>
-            <ThemedText style={styles.captureText}>Capture 🔮</ThemedText>
+            <ThemedText style={styles.captureText}>Take Photo 🔮</ThemedText>
           </Pressable>
         ) : (
           <>
