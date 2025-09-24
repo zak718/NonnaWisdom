@@ -8,8 +8,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
 import { generateWisdom, PERSONALITIES, Personality, speakWisdom } from '@/lib/nonna';
-import { ensureDailyWisdomScheduled } from '@/lib/notifications';
-import { addFavorite, getFavorites, getUsageStatus, tryConsumeQuestion, getPremium, setPremium } from '@/lib/storage';
+import { addFavorite, getFavorites, getUsageStatus, tryConsumeQuestion, setPremium } from '@/lib/storage';
 
 export default function HomeScreen() {
   const [question, setQuestion] = useState('');
@@ -31,7 +30,6 @@ export default function HomeScreen() {
       const favs = await getFavorites();
       setFavoritesCount(favs.length);
 
-      await ensureDailyWisdomScheduled();
     };
     void init();
   }, []);
