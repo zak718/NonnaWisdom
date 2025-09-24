@@ -115,8 +115,8 @@ export default function HomeScreen() {
     Speech.speak(text, {
       language: 'it-IT',
       voice: italianVoice,
-      pitch: 0.85,
-      rate: Platform.select({ ios: 0.5, android: 0.75, default: 0.9 }),
+      rate: 0.7,
+      pitch: 0.8,
       volume: 1.0,
       onDone: () => {},
     });
