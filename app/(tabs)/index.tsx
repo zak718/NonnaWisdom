@@ -27,7 +27,6 @@ export default function HomeScreen() {
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [isGesturing, setIsGesturing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isTtsAvailable, setIsTtsAvailable] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.98)).current;
 
@@ -49,23 +48,7 @@ export default function HomeScreen() {
   }, []);
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const voices = await Speech.getAvailableVoicesAsync?.();
-        if (mounted) {
-          if (Array.isArray(voices) && voices.length > 0) {
-            setIsTtsAvailable(true);
-          } else {
-            setIsTtsAvailable(false);
-          }
-        }
-      } catch {
-        if (mounted) setIsTtsAvailable(false);
-      }
-    })();
     return () => {
-      mounted = false;
       try {
         Speech.stop();
       } catch {}
@@ -153,20 +136,14 @@ export default function HomeScreen() {
     }
   };
 
-  const speakResponse = () => {
+  const speakNonna = () => {
     if (!response) return;
-    if (!isTtsAvailable) {
-      Alert.alert('Speech unavailable', 'Italian voice is not available on this device.');
-      return;
-    }
-    console.log('speakResponse called');
+    console.log('speakNonna called');
     setIsSpeaking(true);
     try {
       Speech.stop();
       Speech.speak(response, {
-        language: 'it-IT',
-        rate: 0.6,
-        pitch: 0.9,
+        language: 'it',
         onDone: () => setIsSpeaking(false),
         onStopped: () => setIsSpeaking(false),
         onError: () => setIsSpeaking(false),
@@ -295,13 +272,13 @@ export default function HomeScreen() {
           {response ? (
             <View style={styles.actionsRow}>
               <TouchableOpacity
-                onPress={speakResponse}
+                onPress={speakNonna}
                 disabled={isSpeaking || !response}
                 activeOpacity={0.8}
                 style={[styles.primaryButton, (isSpeaking || !response) && styles.buttonDisabled, { flex: 1 }]}
               >
                 <Text style={styles.primaryButtonText}>
-                  {isSpeaking ? 'Speaking…' : 'Hear Nonna Speak 🎤'}
+                  {isSpeaking ? 'Speaking…' : 'Hear Nonna'}
                 </Text>
               </TouchableOpacity>
 
