@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,7 +7,10 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  ActivityIndicator,
+  Animated,
 } from 'react-native';
+import * as Speech from 'expo-speech';
 
 import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
 import { addFavorite, getFavorites, setPremium } from '@/lib/storage';
@@ -23,6 +26,10 @@ export default function HomeScreen() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUpgrading, setIsUpgrading] = useState(false);
   const [isGesturing, setIsGesturing] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isTtsAvailable, setIsTtsAvailable] = useState(true);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.98)).current;
 
   useEffect(() => {
     let mounted = true;
@@ -41,6 +48,39 @@ export default function HomeScreen() {
     };
   }, []);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const voices = await Speech.getAvailableVoicesAsync?.();
+        if (mounted) {
+          if (Array.isArray(voices) && voices.length > 0) {
+            setIsTtsAvailable(true);
+          } else {
+            setIsTtsAvailable(false);
+          }
+        }
+      } catch {
+        if (mounted) setIsTtsAvailable(false);
+      }
+    })();
+    return () => {
+      mounted = false;
+      try {
+        Speech.stop();
+      } catch {}
+    };
+  }, []);
+
+  const animateResponse = () => {
+    fadeAnim.setValue(0);
+    scaleAnim.setValue(0.98);
+    Animated.parallel([
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
+      Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 6, tension: 80 }),
+    ]).start();
+  };
+
   const onAskNonna = async () => {
     if (isAsking) return;
     if (!question.trim()) {
@@ -52,6 +92,7 @@ export default function HomeScreen() {
     try {
       const advice = generateWisdom(question.trim(), personality);
       setResponse(advice);
+      animateResponse();
     } catch (err) {
       console.error('onAskNonna error', err);
       Alert.alert('Oops', 'Nonna is tired. Please try again.');
@@ -103,11 +144,35 @@ export default function HomeScreen() {
       ];
       const pick = gestures[Math.floor(Math.random() * gestures.length)];
       setResponse(`Madonna santissima! Gesture recognized: ${pick}`);
+      animateResponse();
     } catch (err) {
       console.error('Gesture recognition failed', err);
       Alert.alert('Error', 'Gesture recognition failed. Try again.');
     } finally {
       setTimeout(() => setIsGesturing(false), 600);
+    }
+  };
+
+  const speakItalian = () => {
+    if (!response) return;
+    if (!isTtsAvailable) {
+      Alert.alert('Speech unavailable', 'Italian voice is not available on this device.');
+      return;
+    }
+    setIsSpeaking(true);
+    try {
+      Speech.stop();
+      Speech.speak(response, {
+        language: 'it-IT',
+        rate: 0.6,
+        pitch: 0.9,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+        onError: () => setIsSpeaking(false),
+      });
+    } catch (e) {
+      setIsSpeaking(false);
+      Alert.alert('Speech error', 'Unable to speak right now.');
     }
   };
 
@@ -134,6 +199,7 @@ export default function HomeScreen() {
                   onPress={() => setPersonality(p)}
                   style={[styles.personalityChip, selected && styles.personalityChipSelected]}
                   disabled={isAsking}
+                  activeOpacity={0.8}
                 >
                   <Text style={[styles.personalityText, selected && styles.personalityTextSelected]}>
                     {p.replace(' Nonna', '')}
@@ -144,7 +210,8 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.statsRow}>
-            <Text style={styles.statsText}>Favorites: {favoritesCount}</Text>
+            <Text style={styles.statsText}><Text style={styles.statsLabel}>Questions:</Text> Unlimited</Text>
+            <Text style={styles.statsText}><Text style={styles.statsLabel}>Favorites:</Text> {favoritesCount}</Text>
             {isPremium ? <Text style={styles.premiumBadge}>Premium</Text> : null}
           </View>
         </View>
@@ -165,15 +232,22 @@ export default function HomeScreen() {
             <TouchableOpacity
               onPress={onAskNonna}
               disabled={isAsking || !question.trim()}
+              activeOpacity={0.8}
               style={[styles.primaryButton, (isAsking || !question.trim()) && styles.buttonDisabled]}
             >
-              <Text style={styles.primaryButtonText}>
-                {isAsking ? 'Thinking…' : 'Ask Nonna for Wisdom 🤌'}
-              </Text>
+              {isAsking ? (
+                <View style={styles.buttonContentRow}>
+                  <ActivityIndicator color="#ffffff" style={{ marginRight: 8 }} />
+                  <Text style={styles.primaryButtonText}>Thinking…</Text>
+                </View>
+              ) : (
+                <Text style={styles.primaryButtonText}>Ask Nonna for Wisdom 🤌</Text>
+              )}
             </TouchableOpacity>
 
             <TouchableOpacity
               onPress={onGoToSuperstition}
+              activeOpacity={0.8}
               style={[styles.secondaryButton]}
             >
               <Text style={styles.secondaryButtonText}>Check Superstition 🔮</Text>
@@ -184,6 +258,7 @@ export default function HomeScreen() {
             <TouchableOpacity
               onPress={onUpgrade}
               disabled={isUpgrading}
+              activeOpacity={0.8}
               style={[styles.outlineButton, isUpgrading && styles.buttonDisabled]}
             >
               <Text style={styles.outlineButtonText}>
@@ -195,6 +270,7 @@ export default function HomeScreen() {
           <TouchableOpacity
             onPress={onRecognizeGesture}
             disabled={isGesturing}
+            activeOpacity={0.8}
             style={[styles.tertiaryButton, isGesturing && styles.buttonDisabled]}
           >
             <Text style={styles.tertiaryButtonText}>
@@ -206,18 +282,32 @@ export default function HomeScreen() {
         <View style={styles.card}>
           <Text style={styles.cardHint}>Nonna’s Response</Text>
           <View style={styles.responseBox}>
-            {response ? (
-              <Text style={styles.responseText}>{response}</Text>
-            ) : (
-              <Text style={styles.responsePlaceholder}>Nonna is listening… Mamma mia! 🍕</Text>
-            )}
+            <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+              {response ? (
+                <Text style={styles.responseText}>{response}</Text>
+              ) : (
+                <Text style={styles.responsePlaceholder}>Nonna is listening… Mamma mia! 🍕</Text>
+              )}
+            </Animated.View>
           </View>
 
           {response ? (
             <View style={styles.actionsRow}>
               <TouchableOpacity
+                onPress={speakItalian}
+                disabled={isSpeaking || !response}
+                activeOpacity={0.8}
+                style={[styles.primaryButton, (isSpeaking || !response) && styles.buttonDisabled, { flex: 1 }]}
+              >
+                <Text style={styles.primaryButtonText}>
+                  {isSpeaking ? 'Speaking…' : 'Hear Nonna Speak 🎤'}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 onPress={onSaveFavorite}
                 disabled={isSaving}
+                activeOpacity={0.8}
                 style={[styles.outlineButton, isSaving && styles.buttonDisabled, { flex: 1 }]}
               >
                 <Text style={styles.outlineButtonText}>
@@ -267,14 +357,17 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
     color: COLORS.text,
     textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.05)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   headerSubtitle: {
     marginTop: 6,
-    fontSize: 14,
+    fontSize: 15,
     color: COLORS.subtle,
     textAlign: 'center',
   },
@@ -312,13 +405,29 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     gap: 12,
     marginTop: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    shadowColor: COLORS.shadow,
+    shadowOpacity: 0.05,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 8,
+    elevation: 2,
   },
   statsText: {
     color: COLORS.text,
     fontWeight: '600',
+  },
+  statsLabel: {
+    color: COLORS.text,
+    fontWeight: '700',
   },
   premiumBadge: {
     color: COLORS.primary,
@@ -338,7 +447,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   cardHint: {
-    fontSize: 12,
+    fontSize: 14,
     color: COLORS.subtle,
     marginBottom: 8,
   },
@@ -373,6 +482,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '700',
   },
+  buttonContentRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   secondaryButton: {
     flex: 1,
     backgroundColor: '#ffffff',
@@ -434,7 +544,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   responseText: {
-    fontSize: 16,
+    fontSize: 17,
     lineHeight: 24,
     color: COLORS.text,
   },
