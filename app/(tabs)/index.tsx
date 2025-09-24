@@ -3,11 +3,12 @@ import { Platform, StyleSheet, TextInput, View, Pressable, Animated, Alert, Scro
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
+import * as Speech from 'expo-speech';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 
-import { generateWisdom, PERSONALITIES, Personality, speakWisdom } from '@/lib/nonna';
+import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
 import { addFavorite, getFavorites, getUsageStatus, tryConsumeQuestion, setPremium } from '@/lib/storage';
 
 export default function HomeScreen() {
@@ -17,6 +18,7 @@ export default function HomeScreen() {
   const [remaining, setRemaining] = useState<number>(3);
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [favoritesCount, setFavoritesCount] = useState<number>(0);
+  const [italianVoice, setItalianVoice] = useState<string | undefined>(undefined);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.98)).current;
@@ -32,6 +34,26 @@ export default function HomeScreen() {
 
     };
     void init();
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const loadVoices = async () => {
+      try {
+        const voices = await Speech.getAvailableVoicesAsync();
+        const it =
+          voices.find((v) => v.language?.toLowerCase().startsWith('it')) ||
+          voices.find((v) => /ital/i.test(v.name || ''));
+        if (mounted) setItalianVoice(it?.identifier);
+      } catch {
+        // ignore voice loading errors
+      }
+    };
+    void loadVoices();
+    return () => {
+      mounted = false;
+      Speech.stop();
+    };
   }, []);
 
   const onAskNonna = async () => {
@@ -58,7 +80,7 @@ export default function HomeScreen() {
     const advice = generateWisdom(question.trim(), personality);
     setResponse(advice);
     animateResponse();
-    speakWisdom(advice);
+    speakItalian(advice);
   };
 
   const onSaveFavorite = async () => {
@@ -85,6 +107,19 @@ export default function HomeScreen() {
       Animated.timing(fadeAnim, { toValue: 1, duration: 450, useNativeDriver: true }),
       Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 6 }),
     ]).start();
+  };
+
+  const speakItalian = (text: string) => {
+    if (!text) return;
+    Speech.stop();
+    Speech.speak(text, {
+      language: 'it-IT',
+      voice: italianVoice,
+      pitch: 0.85,
+      rate: Platform.select({ ios: 0.5, android: 0.75, default: 0.9 }),
+      volume: 1.0,
+      onDone: () => {},
+    });
   };
 
   const remainingLabel = useMemo(() => {
@@ -198,6 +233,15 @@ export default function HomeScreen() {
             )}
           </Animated.View>
         </LinearGradient>
+
+        {response ? (
+          <Pressable
+            onPress={() => speakItalian(response)}
+            style={({ pressed }) => [styles.speakButton, pressed && styles.buttonPressed]}
+          >
+            <ThemedText style={styles.speakButtonText}>Hear Nonna Speak 🎤</ThemedText>
+          </Pressable>
+        ) : null}
 
         {response ? (
           <Pressable
@@ -347,6 +391,19 @@ const styles = StyleSheet.create({
   gestureButtonText: {
     fontWeight: '600',
     color: '#111',
+  },
+  speakButton: {
+    backgroundColor: '#111',
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  speakButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.4)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   responseContainer: {
     minHeight: 140,
