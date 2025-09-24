@@ -92,3 +92,81 @@
 +5. Give ridiculous Italian ritual to fix it
 +6. Examples: spilled food = bad luck, black cat = throw salt, broken mirror = say 7 prayers
 +7. Make responses very dramatic and funny"
+
+# 2025-09-24 17:42:04.386404
++aider app/\(tabs\)/index.tsx --message "Add working Italian text-to-speech:
++1. Import * as Speech from 'expo-speech'
++2. Create a function that uses Speech.speak() with options: {language: 'it-IT', rate: 0.7, pitch: 0.8}
++3. Add a 'Hear Nonna Speak' button next to each response
++4. Make sure the Italian voice actually works when button is pressed"
+
+# 2025-09-24 17:42:29.211411
++n
+
+# 2025-09-24 17:42:29.511282
++Add proper camera permissions for iOS and Android in the app.json file
+
+# 2025-09-24 17:42:29.511370
++Add proper camera permissions for iOS and Android in the app.json file
+
+# 2025-09-24 17:43:07.008651
++aider app/\(tabs\)/superstition.tsx --message "Fix scrolling issues:
++1. Wrap the entire content in ScrollView component
++2. Import ScrollView from react-native
++3. Make sure all content is scrollable
++4. Add proper padding and margins
++5. Ensure camera view doesn't interfere with scrolling"
+
+# 2025-09-24 17:45:16.881637
++# Install NativeBase - professional React Native UI library
++npm install native-base react-native-svg react-native-safe-area-context
++
++# Then redesign with beautiful components
++aider app/\(tabs\)/index.tsx --message "Completely redesign the UI using NativeBase components:
++1. Import { NativeBaseProvider, Box, VStack, HStack, Button, Input, Text, Center, Card } from 'native-base'
++2. Use proper spacing, shadows, and gradients
++3. Create a clean card-based layout
++4. Use professional color scheme (not harsh red/green)
++5. Add proper typography hierarchy
++6. Make buttons look modern with rounded corners and subtle shadows
++7. Use VStack and HStack for proper spacing
++8. Make it look like a premium mobile app"
+
+# 2025-09-24 17:48:39.829495
++aider app/\(tabs\)/index.tsx --message "Remove the daily question limit completely for testing purposes:
++1. Set dailyQuestions to 999 or remove the limit check entirely
++2. Remove any code that decreases the question counter
++3. Make sure users can ask unlimited questions during development
++4. Comment out or delete the 'Questions: X left today' display
++5. Allow unlimited testing of all features"
+
+# 2025-09-24 17:51:06.183452
++aider app/\(tabs\)/index.tsx --message "Fix app freezing issues:
++1. Add proper error handling for all async operations
++2. Add loading states so users know something is happening
++3. Prevent multiple rapid button presses that could cause freezing
++4. Add timeout handling for any network requests
++5. Make sure all state updates are properly handled"
+
+# 2025-09-24 17:54:21.848938
++aider app/\(tabs\)/index.tsx app/_layout.tsx --message "Complete professional UI redesign using NativeBase:
++1. Import NativeBaseProvider and wrap the entire app
++2. Replace all existing components with beautiful NativeBase equivalents
++3. Use Cards, proper spacing, professional color scheme
++4. Add subtle shadows and modern styling
++5. Make buttons disabled while processing to prevent freezing
++6. Create a polished, production-ready interface
++7. Remove ugly colors and improve visual hierarchy"
+
+# 2025-09-24 17:54:45.956604
++y
+
+# 2025-09-24 17:56:33.346111
++aider app/\(tabs\)/index.tsx app/_layout.tsx --message "Complete professional UI redesign using NativeBase:
++1. Import NativeBaseProvider and wrap the entire app
++2. Replace all existing components with beautiful NativeBase equivalents
++3. Use Cards, proper spacing, professional color scheme
++4. Add subtle shadows and modern styling
++5. Make buttons disabled while processing to prevent freezing
++6. Create a polished, production-ready interface
++7. Remove ugly colors and improve visual hierarchy"
