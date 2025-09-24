@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Platform, Animated, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
@@ -18,7 +18,7 @@ import {
 } from 'native-base';
 
 import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
-import { addFavorite, getFavorites, getUsageStatus, tryConsumeQuestion, setPremium } from '@/lib/storage';
+import { addFavorite, getFavorites, setPremium } from '@/lib/storage';
 
 function Card(props: React.ComponentProps<typeof Box>) {
   return (
@@ -30,7 +30,6 @@ export default function HomeScreen() {
   const [question, setQuestion] = useState('');
   const [personality, setPersonality] = useState<Personality>('Sicilian Nonna');
   const [response, setResponse] = useState<string>('');
-  const [remaining, setRemaining] = useState<number>(3);
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [favoritesCount, setFavoritesCount] = useState<number>(0);
   const [italianVoice, setItalianVoice] = useState<string | undefined>(undefined);
@@ -40,10 +39,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const init = async () => {
-      const usage = await getUsageStatus();
-      setRemaining(usage.remaining);
-      setIsPremium(usage.isPremium);
-
+      // Unlimited mode: skipping usage limit initialization
       const favs = await getFavorites();
       setFavoritesCount(favs.length);
     };
@@ -76,19 +72,7 @@ export default function HomeScreen() {
       return;
     }
 
-    const result = await tryConsumeQuestion();
-    if (!result.allowed) {
-      setRemaining(result.remaining);
-      if (!result.isPremium) {
-        Alert.alert(
-          'Out of daily questions',
-          'Upgrade to Premium for unlimited Nonna advice. Nonna is waiting! 🍝'
-        );
-      }
-      return;
-    }
-
-    setRemaining(result.remaining);
+    // Unlimited mode: skipping daily limit checks
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     const advice = generateWisdom(question.trim(), personality);
@@ -109,7 +93,7 @@ export default function HomeScreen() {
   const onUpgrade = async () => {
     await setPremium(true);
     setIsPremium(true);
-    setRemaining(Infinity as unknown as number);
+    // Unlimited mode: no remaining counter to update
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     Alert.alert('Grazie mille!', 'Premium unlocked. Nonna is yours, senza limiti! 💃');
   };
@@ -136,10 +120,7 @@ export default function HomeScreen() {
     });
   };
 
-  const remainingLabel = useMemo(() => {
-    if (isPremium) return 'Unlimited';
-    return `${remaining} left today`;
-  }, [isPremium, remaining]);
+  // Unlimited mode: no remaining label
 
   const onRecognizeGesture = () => {
     const gestures = [
@@ -199,8 +180,7 @@ export default function HomeScreen() {
                 space="4"
                 alignItems="center"
               >
-                <Text fontWeight="bold">Questions: {remainingLabel}</Text>
-                <Text opacity={0.8}>Favorites: {favoritesCount}</Text>
+                <Text fontWeight="bold">Favorites: {favoritesCount}</Text>
               </HStack>
             </VStack>
           </LinearGradient>
