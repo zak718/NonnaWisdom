@@ -187,3 +187,80 @@
 
 # 2025-09-24 18:14:43.802830
 +"Remove ALL native-base imports completely. Use only standard React Native and Expo components. Remove NativeBaseProvider, extendTheme, and any other native-base references. Keep only the basic Expo Router layout structure."
+
+# 2025-09-24 19:05:36.685263
++app/\(tabs\)/index.tsx --message "Improve text readability and visual design while keeping Italian theme:
++1. Increase text contrast - use white text on dark backgrounds, dark text on light backgrounds
++2. Add subtle background colors or cards to separate content sections
++3. Improve font sizes - make sure all text is easily readable
++4. Add proper spacing between elements
++5. Make buttons more prominent with better contrast
++6. Keep the Italian colors but use them as accents, not full backgrounds
++7. Add text shadows or background overlays where needed for readability
++8. Ensure 'Questions left' and 'Favorites' counters are clearly visible"
++Add Working Italian Voice:
++app/\(tabs\)/index.tsx --message "Fix the Italian text-to-speech feature:
++1. Import * as Speech from 'expo-speech'
++2. Add a 'Hear Nonna Speak' button next to each response
++3. Use Speech.speak() with these settings: {language: 'it-IT', rate: 0.6, pitch: 0.9}
++4. Make sure the voice button actually works when clicked
++5. Add visual feedback when speaking (like changing button text to 'Speaking...')
++6. Handle cases where TTS isn't available gracefully"
++Professional Polish:
++app/\(tabs\)/index.tsx --message "Add professional touches:
++1. Add subtle animations when responses appear
++2. Improve button styling with proper hover states
++3. Add loading indicators when waiting for responses
++4. Make the interface feel more responsive and polished
++5. Keep all the Italian personality but make it production-ready"
++
++
++
+
+# 2025-09-24 19:17:30.211243
++
++
++app/\(tabs\)/index.tsx --message "Improve text readability and visual design while keeping Italian theme:
++1. Increase text contrast - use white text on dark backgrounds, dark text on light backgrounds
++2. Add subtle background colors or cards to separate content sections
++3. Improve font sizes - make sure all text is easily readable
++4. Add proper spacing between elements
++5. Make buttons more prominent with better contrast
++6. Keep the Italian colors but use them as accents, not full backgrounds
++7. Add text shadows or background overlays where needed for readability
++8. Ensure 'Questions left' and 'Favorites' counters are clearly visible"
++Add Working Italian Voice:
++app/\(tabs\)/index.tsx --message "Fix the Italian text-to-speech feature:
++1. Import * as Speech from 'expo-speech'
++2. Add a 'Hear Nonna Speak' button next to each response
++3. Use Speech.speak() with these settings: {language: 'it-IT', rate: 0.6, pitch: 0.9}
++4. Make sure the voice button actually works when clicked
++5. Add visual feedback when speaking (like changing button text to 'Speaking...')
++6. Handle cases where TTS isn't available gracefully"
++Professional Polish:
++app/\(tabs\)/index.tsx --message "Add professional touches:
++1. Add subtle animations when responses appear
++2. Improve button styling with proper hover states
++3. Add loading indicators when waiting for responses
++4. Make the interface feel more responsive and polished
++5. Keep all the Italian personality but make it production-ready"
++app/\(tabs\)/index.tsx --message "Make these specific visual improvements:
++1. Change the text input backgroundColor to '#f8f9fa' and color to '#000'
++2. Add backgroundColor: '#ffffff' to the response area with padding: 20
++3. Change all dark text to color: '#333333' for better readability
++4. Add borderRadius: 8 to all buttons and inputs
++5. Increase fontSize to at least 16 for all text
++6. Add marginVertical: 10 between all major sections"
++app/\(tabs\)/index.tsx --message "Add working Italian text-to-speech functionality:
++
++1. Import Speech from expo-speech at the top: import * as Speech from 'expo-speech'
++2. Create a speakResponse function that uses Speech.speak() with these exact options:
++   - language: 'it-IT'
++   - rate: 0.6
++   - pitch: 0.9
++3. Add a 'Hear Nonna Speak' button right next to where the response appears
++4. When clicked, it should read the current Nonna response aloud in Italian
++5. Add error handling in case speech isn't available
++6. Test the button by adding console.log statements to verify it's being called
++
++Make sure the Speech.speak function is actually called when the button is pressed."
