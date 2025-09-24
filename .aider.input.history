@@ -264,3 +264,19 @@
 +6. Test the button by adding console.log statements to verify it's being called
 +
 +Make sure the Speech.speak function is actually called when the button is pressed."
+
+# 2025-09-24 19:24:40.719020
++1. Make sure expo-speech is properly imported: import * as Speech from 'expo-speech'
++2. Add a simple speakNonna function that actually works
++3. Add a visible 'Hear Nonna' button next to responses
++4. Use basic Speech.speak(text, {language: 'it'}) - keep it simple
++5. Remove any complex speech code that's causing errors
++6. Just get basic speech working again like it was before"
+
+# 2025-09-24 19:26:26.372392
++aider app/\(tabs\)/index.tsx --message "Restore basic working functionality:
++1. Remove ALL broken features temporarily
++2. Get speech working with simple expo-speech again
++3. Remove complex styling that may have broken things
++4. Make it functional first, pretty second
++5. Ensure unlimited questions still work"
