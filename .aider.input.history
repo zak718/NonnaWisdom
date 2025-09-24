@@ -1,0 +1,47 @@
+
+# 2025-09-24 16:14:50.853431
++y
+
+# 2025-09-24 16:15:04.445794
++aider --model gpt-4 App.js --message "Create a complete Nonna's Wisdom & Superstition Oracle app with the following features:
++
++1. MAIN INTERFACE:
++- Beautiful Italian-themed UI with red/green/white colors
++- Two main buttons: 'Ask Nonna for Wisdom' and 'Check Superstition'
++- Text input for user questions
++- Animated response area with Italian flag background
++
++2. NONNA WISDOM FEATURE:
++- User types a question or life problem
++- App responds with hilariously dramatic Italian grandmother advice
++- Include phrases like 'Mamma mia!', 'Madonna santissima!', 'Aye bambino!'
++- Responses should be over-the-top dramatic and include Italian cultural references
++- Add text-to-speech so Nonna actually talks (use expo-speech)
++
++3. SUPERSTITION CHECKER:
++- Camera integration to take photos (use expo-camera) 
++- AI analyzes photo and determines what Sicilian superstition applies
++- Provides ridiculous ritual to fix the 'problem'
++- Examples: spilled salt = throw more salt over shoulder while saying 3 Hail Marys
++
++4. MONETIZATION:
++- Free users get 3 questions per day
++- Premium upgrade button for unlimited access
++- Show remaining questions counter
++
++5. ADDITIONAL FEATURES:
++- Save favorite Nonna quotes
++- Different Nonna personalities (Sicilian Nonna, Roman Nonna, etc.)
++- Hand gesture recognition for Italian gestures
++- Daily Italian wisdom notifications
++
++6. STYLING:
++- Use beautiful gradients and Italian flag colors
++- Add Italian food emojis throughout
++- Smooth animations for responses
++- Professional but fun design
++
++Make it production-ready for Google Play Store deployment. Include all necessary imports and dependencies."
+
+# 2025-09-24 16:17:51.718511
++y
