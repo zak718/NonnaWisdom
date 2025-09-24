@@ -153,12 +153,13 @@ export default function HomeScreen() {
     }
   };
 
-  const speakItalian = () => {
+  const speakResponse = () => {
     if (!response) return;
     if (!isTtsAvailable) {
       Alert.alert('Speech unavailable', 'Italian voice is not available on this device.');
       return;
     }
+    console.log('speakResponse called');
     setIsSpeaking(true);
     try {
       Speech.stop();
@@ -294,7 +295,7 @@ export default function HomeScreen() {
           {response ? (
             <View style={styles.actionsRow}>
               <TouchableOpacity
-                onPress={speakItalian}
+                onPress={speakResponse}
                 disabled={isSpeaking || !response}
                 activeOpacity={0.8}
                 style={[styles.primaryButton, (isSpeaking || !response) && styles.buttonDisabled, { flex: 1 }]}
@@ -325,7 +326,7 @@ export default function HomeScreen() {
 const COLORS = {
   background: '#f8f9fa',
   surface: '#ffffff',
-  text: '#495057',
+  text: '#333333',
   subtle: '#868e96',
   primary: '#007bff',
   primaryDark: '#0069d9',
@@ -355,6 +356,10 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderWidth: 1,
     borderColor: COLORS.border,
+    borderTopWidth: 4,
+    borderTopColor: '#CE2B37',
+    borderBottomWidth: 4,
+    borderBottomColor: '#009246',
   },
   headerTitle: {
     fontSize: 22,
@@ -367,7 +372,7 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: {
     marginTop: 6,
-    fontSize: 15,
+    fontSize: 16,
     color: COLORS.subtle,
     textAlign: 'center',
   },
@@ -396,7 +401,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   personalityText: {
-    fontSize: 12,
+    fontSize: 16,
     color: COLORS.text,
   },
   personalityTextSelected: {
@@ -424,6 +429,7 @@ const styles = StyleSheet.create({
   statsText: {
     color: COLORS.text,
     fontWeight: '600',
+    fontSize: 16,
   },
   statsLabel: {
     color: COLORS.text,
@@ -447,19 +453,19 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   cardHint: {
-    fontSize: 14,
+    fontSize: 16,
     color: COLORS.subtle,
     marginBottom: 8,
   },
   input: {
     minHeight: 64,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#f8f9fa',
     padding: 12,
     fontSize: 16,
-    color: COLORS.text,
+    color: '#000',
   },
   actionsRow: {
     flexDirection: 'row',
@@ -470,7 +476,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.primary,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     shadowColor: COLORS.shadow,
     shadowOpacity: 0.15,
@@ -481,13 +487,14 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#ffffff',
     fontWeight: '700',
+    fontSize: 16,
   },
   buttonContentRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
   secondaryButton: {
     flex: 1,
     backgroundColor: '#ffffff',
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.primary,
@@ -500,11 +507,12 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: COLORS.primary,
     fontWeight: '700',
+    fontSize: 16,
   },
   outlineButton: {
     backgroundColor: '#ffffff',
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.primary,
@@ -513,11 +521,12 @@ const styles = StyleSheet.create({
   outlineButtonText: {
     color: COLORS.primary,
     fontWeight: '700',
+    fontSize: 16,
   },
   tertiaryButton: {
     backgroundColor: '#f1f3f5',
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: 8,
     alignItems: 'center',
     marginTop: 10,
     borderWidth: 1,
@@ -526,17 +535,18 @@ const styles = StyleSheet.create({
   tertiaryButtonText: {
     color: COLORS.text,
     fontWeight: '600',
+    fontSize: 16,
   },
   buttonDisabled: {
     opacity: 0.7,
   },
   responseBox: {
     minHeight: 120,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.border,
     backgroundColor: '#ffffff',
-    padding: 14,
+    padding: 20,
     shadowColor: COLORS.shadow,
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 3 },
