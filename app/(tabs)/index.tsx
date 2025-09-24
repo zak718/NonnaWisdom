@@ -8,43 +8,21 @@ import {
   StyleSheet,
   Alert,
   ActivityIndicator,
-  Animated,
 } from 'react-native';
 import * as Speech from 'expo-speech';
 
 import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
-import { addFavorite, getFavorites, setPremium } from '@/lib/storage';
+ // Storage features temporarily disabled for basic functionality
 
 export default function HomeScreen() {
   const [question, setQuestion] = useState('');
   const [personality, setPersonality] = useState<Personality>('Sicilian Nonna');
   const [response, setResponse] = useState<string>('');
-  const [isPremium, setIsPremium] = useState<boolean>(false);
-  const [favoritesCount, setFavoritesCount] = useState<number>(0);
-
   const [isAsking, setIsAsking] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isUpgrading, setIsUpgrading] = useState(false);
-  const [isGesturing, setIsGesturing] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.98)).current;
 
   useEffect(() => {
-    let mounted = true;
-    const init = async () => {
-      try {
-        const favs = await getFavorites();
-        if (mounted) setFavoritesCount(favs.length);
-      } catch (err) {
-        console.error('Failed to load favorites', err);
-        Alert.alert('Error', 'Error loading favorites. Please try again.');
-      }
-    };
-    void init();
-    return () => {
-      mounted = false;
-    };
+    // Basic mode: no startup work needed
   }, []);
 
   useEffect(() => {
@@ -55,14 +33,6 @@ export default function HomeScreen() {
     };
   }, []);
 
-  const animateResponse = () => {
-    fadeAnim.setValue(0);
-    scaleAnim.setValue(0.98);
-    Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }),
-      Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true, friction: 6, tension: 80 }),
-    ]).start();
-  };
 
   const onAskNonna = async () => {
     if (isAsking) return;
@@ -75,7 +45,6 @@ export default function HomeScreen() {
     try {
       const advice = generateWisdom(question.trim(), personality);
       setResponse(advice);
-      animateResponse();
     } catch (err) {
       console.error('onAskNonna error', err);
       Alert.alert('Oops', 'Nonna is tired. Please try again.');
@@ -84,57 +53,8 @@ export default function HomeScreen() {
     }
   };
 
-  const onSaveFavorite = async () => {
-    if (isSaving || !response) return;
-    setIsSaving(true);
-    try {
-      await addFavorite(response);
-      const favs = await getFavorites();
-      setFavoritesCount(favs.length);
-      Alert.alert('Saved ❤️', 'Nonna will remember this one.');
-    } catch (err) {
-      console.error('Failed to save favorite', err);
-      Alert.alert('Error', 'Could not save favorite. Please try again.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
 
-  const onUpgrade = async () => {
-    if (isUpgrading) return;
-    setIsUpgrading(true);
-    try {
-      await setPremium(true);
-      setIsPremium(true);
-      Alert.alert('Grazie mille!', 'Premium unlocked. Nonna is yours, senza limiti! 💃');
-    } catch (err) {
-      console.error('Upgrade failed', err);
-      Alert.alert('Error', 'Upgrade failed. Please try again.');
-    } finally {
-      setIsUpgrading(false);
-    }
-  };
 
-  const onRecognizeGesture = () => {
-    if (isGesturing) return;
-    setIsGesturing(true);
-    try {
-      const gestures = [
-        '🤌 The classic “Ma che vuoi?” pinch detected. Translation: Use more garlic.',
-        '🤟 Cornicello detected! You are protected from the malocchio today.',
-        '✋ Open palm gesture detected. Nonna says: enough drama, eat something.',
-        '👉 Pointing gesture detected. Respect your elders and call your mother!',
-      ];
-      const pick = gestures[Math.floor(Math.random() * gestures.length)];
-      setResponse(`Madonna santissima! Gesture recognized: ${pick}`);
-      animateResponse();
-    } catch (err) {
-      console.error('Gesture recognition failed', err);
-      Alert.alert('Error', 'Gesture recognition failed. Try again.');
-    } finally {
-      setTimeout(() => setIsGesturing(false), 600);
-    }
-  };
 
   const speakNonna = () => {
     if (!response) return;
@@ -189,8 +109,6 @@ export default function HomeScreen() {
 
           <View style={styles.statsRow}>
             <Text style={styles.statsText}><Text style={styles.statsLabel}>Questions:</Text> Unlimited</Text>
-            <Text style={styles.statsText}><Text style={styles.statsLabel}>Favorites:</Text> {favoritesCount}</Text>
-            {isPremium ? <Text style={styles.premiumBadge}>Premium</Text> : null}
           </View>
         </View>
 
@@ -232,41 +150,16 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {!isPremium && (
-            <TouchableOpacity
-              onPress={onUpgrade}
-              disabled={isUpgrading}
-              activeOpacity={0.8}
-              style={[styles.outlineButton, isUpgrading && styles.buttonDisabled]}
-            >
-              <Text style={styles.outlineButtonText}>
-                {isUpgrading ? 'Upgrading…' : 'Upgrade to Premium – Unlimited Advice 💎'}
-              </Text>
-            </TouchableOpacity>
-          )}
-
-          <TouchableOpacity
-            onPress={onRecognizeGesture}
-            disabled={isGesturing}
-            activeOpacity={0.8}
-            style={[styles.tertiaryButton, isGesturing && styles.buttonDisabled]}
-          >
-            <Text style={styles.tertiaryButtonText}>
-              {isGesturing ? 'Analyzing…' : 'Recognize Hand Gesture (beta) ✋🤌'}
-            </Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.card}>
           <Text style={styles.cardHint}>Nonna’s Response</Text>
           <View style={styles.responseBox}>
-            <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
-              {response ? (
-                <Text style={styles.responseText}>{response}</Text>
-              ) : (
-                <Text style={styles.responsePlaceholder}>Nonna is listening… Mamma mia! 🍕</Text>
-              )}
-            </Animated.View>
+            {response ? (
+              <Text style={styles.responseText}>{response}</Text>
+            ) : (
+              <Text style={styles.responsePlaceholder}>Nonna is listening… Mamma mia! 🍕</Text>
+            )}
           </View>
 
           {response ? (
@@ -279,17 +172,6 @@ export default function HomeScreen() {
               >
                 <Text style={styles.primaryButtonText}>
                   {isSpeaking ? 'Speaking…' : 'Hear Nonna'}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={onSaveFavorite}
-                disabled={isSaving}
-                activeOpacity={0.8}
-                style={[styles.outlineButton, isSaving && styles.buttonDisabled, { flex: 1 }]}
-              >
-                <Text style={styles.outlineButtonText}>
-                  {isSaving ? 'Saving…' : 'Save to Favorites ❤️'}
                 </Text>
               </TouchableOpacity>
             </View>
