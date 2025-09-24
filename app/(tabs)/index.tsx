@@ -16,6 +16,7 @@ import {
   Heading,
   useTheme,
 } from 'native-base';
+import { useToast } from 'native-base';
 
 import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
 import { addFavorite, getFavorites, setPremium } from '@/lib/storage';
@@ -33,30 +34,57 @@ export default function HomeScreen() {
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [favoritesCount, setFavoritesCount] = useState<number>(0);
   const [italianVoice, setItalianVoice] = useState<string | undefined>(undefined);
+  const [isAsking, setIsAsking] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUpgrading, setIsUpgrading] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoadingVoices, setIsLoadingVoices] = useState(false);
+  const [isGesturing, setIsGesturing] = useState(false);
+
+  const toast = useToast();
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.98)).current;
 
-  useEffect(() => {
-    const init = async () => {
-      // Unlimited mode: skipping usage limit initialization
-      const favs = await getFavorites();
-      setFavoritesCount(favs.length);
-    };
-    void init();
-  }, []);
+  function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+    return Promise.race<T>([
+      promise,
+      new Promise<T>((_, reject) => setTimeout(() => reject(new Error('Operation timed out')), ms)),
+    ]);
+  }
 
   useEffect(() => {
     let mounted = true;
+    const init = async () => {
+      try {
+        const favs = await withTimeout(getFavorites(), 5000);
+        if (mounted) setFavoritesCount(favs.length);
+      } catch (err) {
+        console.error('Failed to load favorites', err);
+        toast.show({ description: 'Error loading favorites. Please try again.' });
+      }
+    };
+    void init();
+    return () => {
+      mounted = false;
+    };
+  }, [toast]);
+
+  useEffect(() => {
+    let mounted = true;
+    setIsLoadingVoices(true);
     const loadVoices = async () => {
       try {
-        const voices = await Speech.getAvailableVoicesAsync();
+        const voices = await withTimeout(Speech.getAvailableVoicesAsync(), 5000);
         const it =
           voices.find((v) => v.language?.toLowerCase().startsWith('it')) ||
           voices.find((v) => /ital/i.test(v.name || ''));
         if (mounted) setItalianVoice(it?.identifier);
-      } catch {
-        // ignore voice loading errors
+      } catch (e) {
+        console.error('Voice loading failed or timed out', e);
+        if (mounted) toast.show({ description: "Italian voice unavailable, using device's default." });
+      } finally {
+        if (mounted) setIsLoadingVoices(false);
       }
     };
     void loadVoices();
@@ -64,38 +92,68 @@ export default function HomeScreen() {
       mounted = false;
       Speech.stop();
     };
-  }, []);
+  }, [toast]);
 
   const onAskNonna = async () => {
+    if (isAsking) return;
     if (!question.trim()) {
       Alert.alert('Mamma mia!', 'Type a question for Nonna first, amore.');
       return;
     }
 
-    // Unlimited mode: skipping daily limit checks
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setIsAsking(true);
+    try {
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      } catch {}
 
-    const advice = generateWisdom(question.trim(), personality);
-    setResponse(advice);
-    animateResponse();
-    speakItalian(advice);
+      const advice = generateWisdom(question.trim(), personality);
+      setResponse(advice);
+      animateResponse();
+      speakItalian(advice);
+    } catch (err) {
+      console.error('onAskNonna error', err);
+      toast.show({ description: 'Nonna is tired. Please try again.' });
+    } finally {
+      setIsAsking(false);
+    }
   };
 
   const onSaveFavorite = async () => {
-    if (!response) return;
-    await addFavorite(response);
-    const favs = await getFavorites();
-    setFavoritesCount(favs.length);
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Saved ❤️', 'Nonna will remember this one.');
+    if (isSaving || !response) return;
+    setIsSaving(true);
+    try {
+      await withTimeout(addFavorite(response), 5000);
+      const favs = await withTimeout(getFavorites(), 5000);
+      setFavoritesCount(favs.length);
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {}
+      Alert.alert('Saved ❤️', 'Nonna will remember this one.');
+    } catch (err) {
+      console.error('Failed to save favorite', err);
+      toast.show({ description: 'Could not save favorite. Please try again.' });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const onUpgrade = async () => {
-    await setPremium(true);
-    setIsPremium(true);
-    // Unlimited mode: no remaining counter to update
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    Alert.alert('Grazie mille!', 'Premium unlocked. Nonna is yours, senza limiti! 💃');
+    if (isUpgrading) return;
+    setIsUpgrading(true);
+    try {
+      await withTimeout(setPremium(true), 5000);
+      setIsPremium(true);
+      try {
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      } catch {}
+      Alert.alert('Grazie mille!', 'Premium unlocked. Nonna is yours, senza limiti! 💃');
+    } catch (err) {
+      console.error('Upgrade failed', err);
+      toast.show({ description: 'Upgrade failed. Please try again.' });
+    } finally {
+      setIsUpgrading(false);
+    }
   };
 
   const animateResponse = () => {
@@ -109,29 +167,46 @@ export default function HomeScreen() {
 
   const speakItalian = (text: string) => {
     if (!text) return;
-    Speech.stop();
-    Speech.speak(text, {
-      language: 'it-IT',
-      voice: italianVoice,
-      rate: 0.7,
-      pitch: 0.8,
-      volume: 1.0,
-      onDone: () => {},
-    });
+    try {
+      setIsSpeaking(true);
+      Speech.stop();
+      Speech.speak(text, {
+        language: 'it-IT',
+        voice: italianVoice,
+        rate: 0.7,
+        pitch: 0.8,
+        volume: 1.0,
+        onDone: () => setIsSpeaking(false),
+        onStopped: () => setIsSpeaking(false),
+      });
+    } catch (err) {
+      console.error('Speech failed', err);
+      setIsSpeaking(false);
+      toast.show({ description: 'Unable to speak right now.' });
+    }
   };
 
   // Unlimited mode: no remaining label
 
   const onRecognizeGesture = () => {
-    const gestures = [
-      '🤌 The classic “Ma che vuoi?” pinch detected. Translation: Use more garlic.',
-      '🤟 Cornicello detected! You are protected from the malocchio today.',
-      '✋ Open palm gesture detected. Nonna says: enough drama, eat something.',
-      '👉 Pointing gesture detected. Respect your elders and call your mother!',
-    ];
-    const pick = gestures[Math.floor(Math.random() * gestures.length)];
-    setResponse(`Madonna santissima! Gesture recognized: ${pick}`);
-    animateResponse();
+    if (isGesturing) return;
+    setIsGesturing(true);
+    try {
+      const gestures = [
+        '🤌 The classic “Ma che vuoi?” pinch detected. Translation: Use more garlic.',
+        '🤟 Cornicello detected! You are protected from the malocchio today.',
+        '✋ Open palm gesture detected. Nonna says: enough drama, eat something.',
+        '👉 Pointing gesture detected. Respect your elders and call your mother!',
+      ];
+      const pick = gestures[Math.floor(Math.random() * gestures.length)];
+      setResponse(`Madonna santissima! Gesture recognized: ${pick}`);
+      animateResponse();
+    } catch (err) {
+      console.error('Gesture recognition failed', err);
+      toast.show({ description: 'Gesture recognition failed. Try again.' });
+    } finally {
+      setTimeout(() => setIsGesturing(false), 600);
+    }
   };
 
   return (
@@ -182,6 +257,11 @@ export default function HomeScreen() {
               >
                 <Text fontWeight="bold">Favorites: {favoritesCount}</Text>
               </HStack>
+              {isLoadingVoices ? (
+                <Text mt="2" color="white" opacity={0.8}>
+                  Preparing Nonna’s voice…
+                </Text>
+              ) : null}
             </VStack>
           </LinearGradient>
         </Box>
@@ -209,6 +289,8 @@ export default function HomeScreen() {
                   colorScheme="purple"
                   rounded="lg"
                   shadow="2"
+                  isLoading={isAsking}
+                  isDisabled={isAsking || !question.trim()}
                 >
                   Ask Nonna for Wisdom 🤌
                 </Button>
@@ -225,6 +307,8 @@ export default function HomeScreen() {
                   variant="outline"
                   colorScheme="amber"
                   rounded="lg"
+                  isLoading={isUpgrading}
+                  isDisabled={isUpgrading}
                 >
                   Upgrade to Premium – Unlimited Advice 💎
                 </Button>
@@ -235,6 +319,7 @@ export default function HomeScreen() {
                 variant="subtle"
                 colorScheme="coolGray"
                 rounded="lg"
+                isDisabled={isGesturing}
               >
                 Recognize Hand Gesture (beta) ✋🤌
               </Button>
@@ -277,6 +362,8 @@ export default function HomeScreen() {
                     colorScheme="dark"
                     rounded="lg"
                     variant="solid"
+                    isLoading={isSpeaking}
+                    isDisabled={isSpeaking || !response}
                   >
                     Hear Nonna Speak 🎤
                   </Button>
@@ -286,6 +373,8 @@ export default function HomeScreen() {
                     colorScheme="rose"
                     rounded="lg"
                     variant="subtle"
+                    isLoading={isSaving}
+                    isDisabled={isSaving || !response}
                   >
                     Save to Favorites ❤️
                   </Button>
