@@ -1,15 +1,30 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Platform, StyleSheet, TextInput, View, Pressable, Animated, Alert, ScrollView } from 'react-native';
+import { Platform, Animated, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
-
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import {
+  NativeBaseProvider,
+  Box,
+  VStack,
+  HStack,
+  Button,
+  Input,
+  Text,
+  Center,
+  Heading,
+  useTheme,
+} from 'native-base';
 
 import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
 import { addFavorite, getFavorites, getUsageStatus, tryConsumeQuestion, setPremium } from '@/lib/storage';
+
+function Card(props: React.ComponentProps<typeof Box>) {
+  return (
+    <Box bg="white" _dark={{ bg: 'coolGray.800' }} rounded="2xl" shadow="3" p="4" {...props} />
+  );
+}
 
 export default function HomeScreen() {
   const [question, setQuestion] = useState('');
@@ -31,7 +46,6 @@ export default function HomeScreen() {
 
       const favs = await getFavorites();
       setFavoritesCount(favs.length);
-
     };
     void init();
   }, []);
@@ -68,7 +82,7 @@ export default function HomeScreen() {
       if (!result.isPremium) {
         Alert.alert(
           'Out of daily questions',
-          'Upgrade to Premium for unlimited Nonna advice. Nonna is waiting! 🍝',
+          'Upgrade to Premium for unlimited Nonna advice. Nonna is waiting! 🍝'
         );
       }
       return;
@@ -128,7 +142,6 @@ export default function HomeScreen() {
   }, [isPremium, remaining]);
 
   const onRecognizeGesture = () => {
-    // Fun placeholder for gesture recognition
     const gestures = [
       '🤌 The classic “Ma che vuoi?” pinch detected. Translation: Use more garlic.',
       '🤟 Cornicello detected! You are protected from the malocchio today.',
@@ -141,284 +154,167 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-      <LinearGradient
-        colors={['#CE2B37', '#FFFFFF', '#009246']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.headerGradient}
-      >
-        <ThemedText type="title" style={styles.title}>Nonna’s Wisdom & Superstition Oracle 🇮🇹</ThemedText>
-        <ThemedText type="subtitle" style={styles.subtitle}>
-          Ask with respect, eat with gusto. 🍝🍷
-        </ThemedText>
+    <NativeBaseProvider>
+      <Box flex={1} bg="muted.50" _dark={{ bg: 'coolGray.900' }}>
+        <Box overflow="hidden" roundedBottom="3xl" shadow="6">
+          <LinearGradient
+            colors={['#6366F1', '#8B5CF6', '#F472B6']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ paddingTop: 56, paddingBottom: 20, paddingHorizontal: 16 }}
+          >
+            <VStack space="2" alignItems="center">
+              <Heading size="lg" color="white" textAlign="center">
+                Nonna’s Wisdom & Superstition Oracle 🇮🇹
+              </Heading>
+              <Text color="white" opacity={0.9} textAlign="center">
+                Ask with respect, eat with gusto. 🍝🍷
+              </Text>
 
-        <View style={styles.personalityRow}>
-          {PERSONALITIES.map((p) => {
-            const selected = p === personality;
-            return (
-              <Pressable
-                key={p}
-                onPress={() => setPersonality(p)}
-                style={[styles.personalityChip, selected && styles.personalityChipSelected]}
+              <HStack flexWrap="wrap" space="2" justifyContent="center" mt="3">
+                {PERSONALITIES.map((p) => {
+                  const selected = p === personality;
+                  return (
+                    <Button
+                      key={p}
+                      size="sm"
+                      variant={selected ? 'solid' : 'subtle'}
+                      colorScheme={selected ? 'purple' : 'coolGray'}
+                      rounded="full"
+                      onPress={() => setPersonality(p)}
+                    >
+                      {p.replace(' Nonna', '')}
+                    </Button>
+                  );
+                })}
+              </HStack>
+
+              <HStack
+                mt="3"
+                bg="white"
+                _dark={{ bg: 'coolGray.800' }}
+                px="4"
+                py="2"
+                rounded="lg"
+                space="4"
+                alignItems="center"
               >
-                <ThemedText style={[styles.personalityText, selected && styles.personalityTextSelected]}>
-                  {p.replace(' Nonna', '')}
-                </ThemedText>
-              </Pressable>
-            );
-          })}
-        </View>
+                <Text fontWeight="bold">Questions: {remainingLabel}</Text>
+                <Text opacity={0.8}>Favorites: {favoritesCount}</Text>
+              </HStack>
+            </VStack>
+          </LinearGradient>
+        </Box>
 
-        <View style={styles.counterRow}>
-          <ThemedText type="defaultSemiBold" style={{ color: '#111' }}>Questions: {remainingLabel}</ThemedText>
-          <ThemedText style={{ color: '#111' }}>Favorites: {favoritesCount}</ThemedText>
-        </View>
-      </LinearGradient>
+        <VStack space="4" px="4" py="4">
+          <Card>
+            <VStack space="3">
+              <Text fontSize="xs" color="muted.500">
+                Ask Nonna anything… (love, food, life, superstition)
+              </Text>
+              <Input
+                value={question}
+                onChangeText={setQuestion}
+                placeholder="Type your question"
+                variant="filled"
+                bg="muted.100"
+                _dark={{ bg: 'coolGray.700' }}
+                rounded="lg"
+                size="md"
+              />
+              <HStack space="3">
+                <Button
+                  flex={1}
+                  onPress={onAskNonna}
+                  colorScheme="purple"
+                  rounded="lg"
+                  shadow="2"
+                >
+                  Ask Nonna for Wisdom 🤌
+                </Button>
+                <Link href="/superstition" asChild>
+                  <Button flex={1} colorScheme="emerald" rounded="lg" shadow="2">
+                    Check Superstition 🔮
+                  </Button>
+                </Link>
+              </HStack>
 
-      <ThemedView style={styles.content}>
-        <TextInput
-          value={question}
-          onChangeText={setQuestion}
-          placeholder="Ask Nonna anything… (love, food, life, superstition)"
-          placeholderTextColor="#666"
-          style={styles.input}
-          multiline
-        />
+              {!isPremium && (
+                <Button
+                  onPress={onUpgrade}
+                  variant="outline"
+                  colorScheme="amber"
+                  rounded="lg"
+                >
+                  Upgrade to Premium – Unlimited Advice 💎
+                </Button>
+              )}
 
-        <View style={styles.actionsRow}>
-          <Pressable
-            onPress={onAskNonna}
-            style={({ pressed }) => [styles.primaryButton, pressed && styles.buttonPressed]}
-          >
-            <ThemedText style={styles.primaryButtonText}>Ask Nonna for Wisdom 🤌</ThemedText>
-          </Pressable>
+              <Button
+                onPress={onRecognizeGesture}
+                variant="subtle"
+                colorScheme="coolGray"
+                rounded="lg"
+              >
+                Recognize Hand Gesture (beta) ✋🤌
+              </Button>
+            </VStack>
+          </Card>
 
-          <Link href="/superstition" asChild>
-            <Pressable style={({ pressed }) => [styles.secondaryButton, pressed && styles.buttonPressed]}>
-              <ThemedText style={styles.secondaryButtonText}>Check Superstition 🔮</ThemedText>
-            </Pressable>
-          </Link>
-        </View>
+          <Card>
+            <VStack space="3">
+              <Text fontSize="xs" color="muted.500">
+                Nonna’s Response
+              </Text>
+              <Box
+                rounded="lg"
+                borderWidth={1}
+                borderColor="muted.200"
+                _dark={{ borderColor: 'coolGray.700' }}
+                overflow="hidden"
+              >
+                <LinearGradient
+                  colors={['rgba(99,102,241,0.08)', 'rgba(139,92,246,0.08)', 'rgba(244,114,182,0.08)']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={{ padding: 16 }}
+                >
+                  <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+                    {response ? (
+                      <Text fontSize="md">{response}</Text>
+                    ) : (
+                      <Text color="muted.500">Nonna is listening… Mamma mia! 🍕</Text>
+                    )}
+                  </Animated.View>
+                </LinearGradient>
+              </Box>
 
-        {!isPremium && (
-          <Pressable
-            onPress={onUpgrade}
-            style={({ pressed }) => [styles.upgradeButton, pressed && styles.buttonPressed]}
-          >
-            <ThemedText style={styles.upgradeButtonText}>Upgrade to Premium – Unlimited Advice 💎</ThemedText>
-          </Pressable>
-        )}
-
-        <Pressable
-          onPress={onRecognizeGesture}
-          style={({ pressed }) => [styles.gestureButton, pressed && styles.buttonPressed]}
-        >
-          <ThemedText style={styles.gestureButtonText}>Recognize Hand Gesture (beta) ✋🤌</ThemedText>
-        </Pressable>
-
-        <LinearGradient
-          colors={['rgba(206,43,55,0.15)', 'rgba(255,255,255,0.5)', 'rgba(0,146,70,0.15)']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.responseContainer}
-        >
-          <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
-            {response ? (
-              <ThemedText style={styles.responseText}>{response}</ThemedText>
-            ) : (
-              <ThemedText style={styles.responsePlaceholder}>
-                Nonna is listening… ask her anything. Mamma mia! 🍕
-              </ThemedText>
-            )}
-          </Animated.View>
-        </LinearGradient>
-
-        {response ? (
-          <Pressable
-            onPress={() => speakItalian(response)}
-            style={({ pressed }) => [styles.speakButton, pressed && styles.buttonPressed]}
-          >
-            <ThemedText style={styles.speakButtonText}>Hear Nonna Speak 🎤</ThemedText>
-          </Pressable>
-        ) : null}
-
-        {response ? (
-          <Pressable
-            onPress={onSaveFavorite}
-            style={({ pressed }) => [styles.favoriteButton, pressed && styles.buttonPressed]}
-          >
-            <ThemedText style={styles.favoriteButtonText}>Save to Favorites ❤️</ThemedText>
-          </Pressable>
-        ) : null}
-      </ThemedView>
-    </ScrollView>
+              {response ? (
+                <HStack space="3">
+                  <Button
+                    flex={1}
+                    onPress={() => speakItalian(response)}
+                    colorScheme="dark"
+                    rounded="lg"
+                    variant="solid"
+                  >
+                    Hear Nonna Speak 🎤
+                  </Button>
+                  <Button
+                    flex={1}
+                    onPress={onSaveFavorite}
+                    colorScheme="rose"
+                    rounded="lg"
+                    variant="subtle"
+                  >
+                    Save to Favorites ❤️
+                  </Button>
+                </HStack>
+              ) : null}
+            </VStack>
+          </Card>
+        </VStack>
+      </Box>
+    </NativeBaseProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  scroll: {
-    paddingBottom: 40,
-  },
-  headerGradient: {
-    paddingTop: 56,
-    paddingBottom: 20,
-    paddingHorizontal: 16,
-  },
-  title: {
-    textAlign: 'center',
-    color: '#111',
-    backgroundColor: 'rgba(255,255,255,0.85)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  subtitle: {
-    textAlign: 'center',
-    marginTop: 6,
-    color: '#111',
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    alignSelf: 'center',
-    overflow: 'hidden',
-  },
-  personalityRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  personalityChip: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#888',
-    backgroundColor: 'rgba(255,255,255,0.4)',
-  },
-  personalityChipSelected: {
-    backgroundColor: '#009246',
-    borderColor: '#009246',
-  },
-  personalityText: {
-    fontSize: 12,
-    color: '#111',
-  },
-  personalityTextSelected: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  counterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 14,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    gap: 8,
-  },
-  content: {
-    padding: 16,
-    gap: 12,
-  },
-  input: {
-    minHeight: 64,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
-    fontSize: 16,
-  },
-  actionsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  primaryButton: {
-    flex: 1,
-    backgroundColor: '#CE2B37',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.35)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: '#009246',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  secondaryButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.35)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  upgradeButton: {
-    backgroundColor: '#222',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  upgradeButtonText: {
-    color: '#FFD700',
-    fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.5)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  gestureButton: {
-    backgroundColor: '#f0f0f0',
-    paddingVertical: 10,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  gestureButtonText: {
-    fontWeight: '600',
-    color: '#111',
-  },
-  speakButton: {
-    backgroundColor: '#111',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  speakButtonText: {
-    color: '#fff',
-    fontWeight: '700',
-    textShadowColor: 'rgba(0,0,0,0.4)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
-  },
-  responseContainer: {
-    minHeight: 140,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  responseText: {
-    fontSize: 16,
-    lineHeight: 24,
-    color: '#111',
-  },
-  responsePlaceholder: {
-    fontSize: 16,
-    color: '#333',
-  },
-});
