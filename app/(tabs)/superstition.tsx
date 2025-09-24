@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View, Pressable, Alert } from 'react-native';
+import { StyleSheet, View, Pressable, Alert, ScrollView } from 'react-native';
 import { Image } from 'expo-image';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
@@ -82,7 +82,8 @@ export default function SuperstitionScreen() {
   };
 
   return (
-    <ThemedView style={styles.container}>
+    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+      <ThemedView style={styles.container}>
       {!photoUri ? (
         <CameraView
           ref={cameraRef}
@@ -132,10 +133,12 @@ export default function SuperstitionScreen() {
         )}
       </View>
     </ThemedView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  scroll: { padding: 16, paddingBottom: 32 },
   container: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16, padding: 16 },
   permissionButton: {
@@ -145,8 +148,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   permissionText: { color: '#fff', fontWeight: '700' },
-  camera: { height: 360, width: '100%', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, overflow: 'hidden' },
-  preview: { height: 360, width: '100%', borderBottomLeftRadius: 16, borderBottomRightRadius: 16 },
+  camera: { height: 360, width: '100%', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, overflow: 'hidden', marginBottom: 12 },
+  preview: { height: 360, width: '100%', borderBottomLeftRadius: 16, borderBottomRightRadius: 16, marginBottom: 12 },
   actions: {
     flexDirection: 'row',
     gap: 12,
