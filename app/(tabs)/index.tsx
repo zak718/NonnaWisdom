@@ -5,25 +5,31 @@ import { Link } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import * as Speech from 'expo-speech';
 import {
-  NativeBaseProvider,
   Box,
   VStack,
   HStack,
   Button,
   Input,
   Text,
-  Center,
   Heading,
-  useTheme,
+  useToast,
 } from 'native-base';
-import { useToast } from 'native-base';
 
 import { generateWisdom, PERSONALITIES, Personality } from '@/lib/nonna';
 import { addFavorite, getFavorites, setPremium } from '@/lib/storage';
 
 function Card(props: React.ComponentProps<typeof Box>) {
   return (
-    <Box bg="white" _dark={{ bg: 'coolGray.800' }} rounded="2xl" shadow="3" p="4" {...props} />
+    <Box
+      bg="white"
+      _dark={{ bg: 'coolGray.800', borderColor: 'coolGray.700' }}
+      rounded="2xl"
+      shadow="4"
+      p="4"
+      borderWidth="1"
+      borderColor="muted.100"
+      {...props}
+    />
   );
 }
 
@@ -210,9 +216,8 @@ export default function HomeScreen() {
   };
 
   return (
-    <NativeBaseProvider>
-      <Box flex={1} bg="muted.50" _dark={{ bg: 'coolGray.900' }}>
-        <Box overflow="hidden" roundedBottom="3xl" shadow="6">
+    <Box flex={1} bg="muted.50" _dark={{ bg: 'coolGray.900' }}>
+      <Box overflow="hidden" roundedBottom="3xl" shadow="6">
           <LinearGradient
             colors={['#6366F1', '#8B5CF6', '#F472B6']}
             start={{ x: 0, y: 0 }}
@@ -295,7 +300,7 @@ export default function HomeScreen() {
                   Ask Nonna for Wisdom 🤌
                 </Button>
                 <Link href="/superstition" asChild>
-                  <Button flex={1} colorScheme="emerald" rounded="lg" shadow="2">
+                  <Button flex={1} colorScheme="indigo" rounded="lg" shadow="2">
                     Check Superstition 🔮
                   </Button>
                 </Link>
@@ -384,6 +389,5 @@ export default function HomeScreen() {
           </Card>
         </VStack>
       </Box>
-    </NativeBaseProvider>
   );
 }
