@@ -136,8 +136,8 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.counterRow}>
-          <ThemedText type="defaultSemiBold">Questions: {remainingLabel}</ThemedText>
-          <ThemedText>Favorites: {favoritesCount}</ThemedText>
+          <ThemedText type="defaultSemiBold" style={{ color: '#111' }}>Questions: {remainingLabel}</ThemedText>
+          <ThemedText style={{ color: '#111' }}>Favorites: {favoritesCount}</ThemedText>
         </View>
       </LinearGradient>
 
@@ -223,10 +223,23 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
+    color: '#111',
+    backgroundColor: 'rgba(255,255,255,0.85)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   subtitle: {
     textAlign: 'center',
     marginTop: 6,
+    color: '#111',
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    alignSelf: 'center',
+    overflow: 'hidden',
   },
   personalityRow: {
     flexDirection: 'row',
@@ -249,6 +262,7 @@ const styles = StyleSheet.create({
   },
   personalityText: {
     fontSize: 12,
+    color: '#111',
   },
   personalityTextSelected: {
     color: '#fff',
@@ -258,6 +272,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 14,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    gap: 8,
   },
   content: {
     padding: 16,
@@ -285,6 +304,9 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: '#fff',
     fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   secondaryButton: {
     flex: 1,
@@ -296,6 +318,9 @@ const styles = StyleSheet.create({
   secondaryButtonText: {
     color: '#fff',
     fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.35)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   buttonPressed: {
     opacity: 0.85,
@@ -309,6 +334,9 @@ const styles = StyleSheet.create({
   upgradeButtonText: {
     color: '#FFD700',
     fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   gestureButton: {
     backgroundColor: '#f0f0f0',
@@ -318,6 +346,7 @@ const styles = StyleSheet.create({
   },
   gestureButtonText: {
     fontWeight: '600',
+    color: '#111',
   },
   responseContainer: {
     minHeight: 140,
@@ -329,9 +358,10 @@ const styles = StyleSheet.create({
   responseText: {
     fontSize: 16,
     lineHeight: 24,
+    color: '#111',
   },
   responsePlaceholder: {
     fontSize: 16,
-    color: '#666',
+    color: '#333',
   },
 });
