@@ -280,3 +280,21 @@
 +3. Remove complex styling that may have broken things
 +4. Make it functional first, pretty second
 +5. Ensure unlimited questions still work"
+
+# 2025-09-24 19:34:00.114526
++app/\(tabs\)/superstition.tsx --message "Fix the superstition tab so it actually loads a camera interface instead of showing 'switch to tab' message:
++1. Create a proper React component that renders a camera screen
++2. Import expo-camera if available, or create a placeholder camera interface
++3. Remove the popup message about switching tabs
++4. Add a 'Take Photo' button that triggers superstition analysis
++5. Make it actually function as a superstition checker screen"
+
+# 2025-09-24 19:36:01.571843
++aider app/\(tabs\)/index.tsx --message "Add much more variety to Nonna's responses - create at least 20 different response templates:
++1. Add different response patterns based on question topics (love, food, work, family, money)
++2. Create responses for different Nonna personalities (Sicilian, Roman, Neapolitan, Tuscan)
++3. Add more Italian phrases, expressions, and cultural references
++4. Include different levels of drama and emotion in responses
++5. Make responses feel more personalized and less repetitive
++6. Add seasonal or weather-related responses
++7. Include references to Italian food, family traditions, and superstitions"
